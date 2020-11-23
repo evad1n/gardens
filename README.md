@@ -1,11 +1,4 @@
-# Gardens v3.0
-
-[Assignment link](http://cit.dixie.edu/cs/3200/assignments/authentication.xhtml)
-
-## TODO:
-
-- Searchbar UX
-
+# Gardens Server
 ## Resources
 
 **Users**
