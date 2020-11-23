@@ -1,0 +1,123 @@
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 15px;
+}
+
+.input-group {
+    width: 45%;
+    margin: 0 10px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.input-group label {
+    position: absolute;
+    top: -22px;
+}
+
+.input-group input {
+    flex-grow: 1;
+}
+
+.form-container {
+    margin: 10% auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(175, 197, 146);
+    box-shadow: 0 7px 8px -4px rgba(0, 0, 0, .2), 0 13px 19px 2px rgba(0, 0, 0, .14), 0 5px 24px 4px rgba(0, 0, 0, .12);
+    border-radius: 2px;
+}
+
+.form-container h1 {
+    font-size: 36px;
+    margin: 10px 0;
+    justify-self: start;
+    align-self: center;
+}
+
+.form-container form {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.form-container button {
+    justify-self: end;
+    align-self: center;
+    width: auto;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 3px;
+    font-size: 22px;
+}
+
+
+.form-container.login .form-row {
+    justify-content: center;
+    width: 80%;
+    align-self: center;
+}
+
+.form-container.login .input-group {
+    /* width: 50%; */
+}
+
+.form-container.login {
+    width: 400px;
+}
+
+.form-container.register {
+    width: 600px;
+}
+
+#new-user {
+    text-align: center;
+}
+
+footer {
+    justify-self: end;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+footer h2:hover {
+    color: rgb(175, 197, 146) !important;
+}
+
+#auth {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(240, 240, 240);
+}
+
+#user {
+    margin-top: 12%;
+    display: none;
+}
+
+.form-container input {
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: rgb(240, 240, 240);
+    border: 1px rgb(124, 128, 121) solid;
+    border-radius: 4px;
+}
+
+.error {
+    background-color: rgba(255, 147, 147, 0.14);
+    border: 2px solid red;
+    width: 80%;
+    margin: 10px auto;
+    display: none;
+}
+
+.error p {
+    color: red;
+    text-align: center;
+    padding: 5px;
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="media/slider.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@300&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/login.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/gardens.css">
+    <link rel="stylesheet" href="styles/comments.css">
+    <link rel="stylesheet" href="styles/components/modal.css">
+    <link rel="stylesheet" href="styles/components/searchbar.css">
+    <link rel="stylesheet" href="styles/components/checkbox.css">
+    <title>Gardens</title>
+</head>
+
+<body>
+    <div id="create-garden-modal" class="modal">
+        <div class="modal-content">
+            <span id="create-garden-close" class="close">&times;</span>
+            <div id="create-garden-form" class="form">
+                <label for="name">New Garden</label>
+                <input id="create-garden-name" type="text" name="name" placeholder="Name">
+                <button class="big-button" onclick="validateCreateGarden()">Create</button>
+            </div>
+        </div>
+    </div>
+    <div id="edit-garden-modal" class="modal">
+        <div class="modal-content">
+            <span id="edit-garden-close" class="close">&times;</span>
+            <div id="edit-garden-form" class="form">
+                <label for="name">Garden Name</label>
+                <input id="edit-garden-name" type="text" name="name" placeholder="Name">
+                <div class="inline-controls">
+                    <button class="big-button delete" onclick="confirmDeleteGarden()">Delete</button>
+                    <button class="big-button" onclick="validateEditGarden()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="comment-modal" class="modal">
+        <div class="modal-content">
+            <span id="comment-close" class="close">&times;</span>
+            <div id="comment-info" class="info">
+                <div class="comment-detail">
+                    <label for="user">User: </label>
+                    <p id="comment-author" name="user"></p>
+                </div>
+                <div class="comment-detail">
+                    <label for="content">Comment: </label>
+                    <p id="comment-content" name="content"></p>
+                </div>
+                <button id="delete-comment" class="big-button delete" onclick="confirmDeleteComment()">Remove</button>
+            </div>
+        </div>
+    </div>
+    <nav id="navbar">
+        <div id="navbar-left">
+            <div id="login-button">
+                <p class="link" onclick="goToLogin()">Login</p>
+            </div>
+            <div id="user">
+                <p class="link" onclick="confirmLogout()">Hello, </p>
+            </div>
+        </div>
+        <h1>GARDENS</h1>
+        <div id="navbar-right">
+            <div id="saving-container">
+                <div id="saving"></div>
+                <p id="save-text">Saving...</p>
+            </div>
+        </div>
+    </nav>
+
+    <div id="auth">
+        <div class="auth-container">
+            <div class="form-container login">
+                <h1>Login</h1>
+                <div id="bad-login" class="error">
+                    <p></p>
+                </div>
+                <form>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" id="email" placeholder="Email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" id="password" placeholder="Password" required>
+                        </div>
+                    </div>
+                </form>
+                <p id="new-user" class="link" onclick="goToRegister()">New user? Click here to register</p>
+                <button class="big-button" onclick="login()">Login</button>
+            </div>
+
+            <div class="form-container register">
+                <h1>Registration</h1>
+                <div id="bad-register" class="error">
+                    <p></p>
+                </div>
+                <form>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="register-first-name">First Name</label>
+                            <input type="text" name="first-name" id="register-first-name" placeholder="First name"
+                                required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-last-name">Last Name</label>
+                            <input type="text" name="last-name" id="register-last-name" placeholder="Last name"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" name="email" id="register-email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" name="password" id="register-password" placeholder="Password"
+                                required>
+                        </div>
+                    </div>
+                </form>
+                <button class="big-button" onclick="register()">Register</button>
+            </div>
+        </div>
+
+        <footer>
+            <h2 class="link" onclick="goToGardens()">Back to Gardens</h2>
+        </footer>
+    </div>
+
+    <main>
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h2>Search For Gardens</h2>
+                <input id="search" type="text" placeholder="Search..">
+            </div>
+            <div id="gardens" class="item-list-container">
+                <h2>Your Gardens</h2>
+                <ul id="gardens-list" class="item-list">
+
+                </ul>
+            </div>
+            <div id="sidebar-footer">
+                <button id="create" class="big-button">Create New Garden</button>
+            </div>
+        </div>
+        <div id="content">
+            <div class="no-garden">
+                <h1>No garden selected</h1>
+            </div>
+            <div id="garden-info" class="have-garden">
+                <h1 id="title">-garden-name-<svg id="edit-garden" class="edit" viewBox="0 0 528.899 528.899"
+                        fill="black">
+                        <path
+                            d="M328.883,89.125l107.59,107.589l-272.34,272.34L56.604,361.465L328.883,89.125z M518.113,63.177l-47.981-47.981c-18.543-18.543-48.653-18.543-67.259,0l-45.961,45.961l107.59,107.59l53.611-53.611C532.495,100.753,532.495,77.559,518.113,63.177z M0.3,512.69c-1.958,8.812,5.998,16.708,14.811,14.565l119.891-29.069L27.473,390.597L0.3,512.69z" />
+                    </svg></h1>
+                <p>By <span id="author">-garden-author-</span></p>
+            </div>
+            <canvas ondrop="drop(event)" ondragover="allowDrop(event)" id="canvas" width="1000" height="600">
+                a pretty garden
+            </canvas>
+            <div class="no-garden controls-description">
+                <h2>Please select a garden or create a new one</h2>
+            </div>
+            <div class="no-auth-garden controls-description">
+                <h2>Please login to interact with gardens</h2>
+            </div>
+            <div class="not-your-garden controls-description">
+                <h2>You may only edit your own gardens</h2>
+            </div>
+            <div id="garden-controls" class="have-auth-and-your-garden">
+                <div id="flowers">
+                    <div draggable="true" ondragstart="drag(event)" id="blue"></div>
+                    <div draggable="true" ondragstart="drag(event)" id="purple"></div>
+                    <div draggable="true" ondragstart="drag(event)" id="red"></div>
+                    <div draggable="true" ondragstart="drag(event)" id="white"></div>
+                    <div draggable="true" ondragstart="drag(event)" id="yellow"></div>
+                </div>
+                <div id="drawing-controls">
+                    <div class="label-control">
+                        <label class="checkbox-container" for="erasing">Erasing
+                            <input id="erasing" onchange="toggleErasing()" type="checkbox" name="erasing">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                    <div class="label-control">
+                        <label for="flower-size">Flower Size</label>
+                        <input id="flower-size" class="slider" name="flower-size" type="range" min="20" max="60"
+                            value="40">
+                    </div>
+                    <button id="save" class="big-button" onclick="saveFlowers()">Save</button>
+                </div>
+            </div>
+        </div>
+        <div id="comment-bar">
+            <h1>Comments</h1>
+            <div id="comments" class="item-list-container">
+                <ul id="comments-list" class="item-list">
+
+                </ul>
+            </div>
+            <div id="comment-form">
+                <textarea id="input-comment" placeholder="Leave a comment.."></textarea>
+                <button onclick="validateComment()" class="big-button">Add Comment</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/session.js"></script>
+    <script src="scripts/drawing.js"></script>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/searchbar.js"></script>
+    <script src="scripts/modal.js"></script>
+</body>
+
+</html>
