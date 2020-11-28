@@ -37,6 +37,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Handle GET requests. """
         self.load_session()
         coll, id, valid = self.parse_path()
+        print(coll, id, valid)
         if not valid:
             self.response(404)
 
@@ -127,6 +128,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
                 id = parts[1]
             else:
                 return bad
+        print(collection, id, True)
         return (collection, id, True)
 
 
