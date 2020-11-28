@@ -36,7 +36,9 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """ Handle GET requests. """
         self.load_session()
-        coll, id = self.parse_path()
+        coll, id, valid = self.parse_path()
+        if not valid:
+            self.response(404)
 
         if coll == "gardens":
             if id:
@@ -51,7 +53,9 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         """ Handle POST requests. """
         self.load_session()
-        coll, id = self.parse_path()
+        coll, id, valid = self.parse_path()
+        if not valid:
+            self.response(404)
         if id:
             self.response(404)
 
@@ -71,7 +75,9 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
         """ Handle PUT requests. """
         self.load_session()
-        coll, id = self.parse_path()
+        coll, id, valid = self.parse_path()
+        if not valid:
+            self.response(404)
 
         if coll == "gardens" and id:
             self.update_garden(id)
@@ -83,7 +89,9 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         """ Handle DELETE requests. """
         self.load_session()
-        coll, id = self.parse_path()
+        coll, id, valid = self.parse_path()
+        if not valid:
+            self.response(404)
 
         if coll == "sessions" and not id:
             self.delete_session()
@@ -100,14 +108,16 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     # HELPER METHODS
 
     def parse_path(self):
-        """ Gets the resource collection and id from the request path. If it is not valid then return False. """
+        """ Gets the resource collection and id from the request path. If it is not valid then valid will be False. """
+        bad = (0, 0, False)
+
         if not self.path.startswith("/"):
-            return False
+            return bad
         # Skip first /
         parts = self.path[1:].split("/")
         # Throw away anything with too many parameters
         if len(parts) > 2:
-            return False
+            return bad
 
         collection = parts[0]
         id = None
@@ -116,8 +126,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if type(parts[1]) is int:
                 id = parts[1]
             else:
-                return False
-        return (collection, id)
+                return bad
+        return (collection, id, True)
 
 
     def decode(self):
