@@ -114,6 +114,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         # Make sure type is int
         if len(parts) > 1 and type(parts[1]) is int:
             id = parts[1]
+        print(collection, id)
         return (collection, id)
 
 
@@ -128,6 +129,13 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         if body:
             self.send_header("Content-Type", "application/json")
+        # Generic 401 msg
+        if status_code == 401:
+            self.send_header("Content-Type", "application/json")
+            self.wfile.write(bytes(json.dumps({'message': "Not authenticated"}), "utf-8"))
+        if status_code == 403:
+            self.send_header("Content-Type", "application/json")
+            self.wfile.write(bytes(json.dumps({'message': "Can only modify owned resources"}), "utf-8"))
         self.send_cookie()
         self.send_header("Access-Control-Allow-Origin", self.headers["Origin"])
         self.send_header("Access-Control-Allow-Credentials", "true")
@@ -205,7 +213,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         # check if email is duplicate
         user = DB.get_user(email)
         if user != None:
-            self.response(422)
+            self.response(422, True)
+            self.wfile.write(bytes(json.dumps({'message': "No duplicate email"}), "utf-8"))
             return
 
         self.response(201, True)
@@ -217,8 +226,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Gets user data if logged in. """
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401, True)
-            self.wfile.write(bytes(json.dumps({'message': "Not authenticated"}), "utf-8"))
+            self.response(401)
             return
         
         self.response(200, True)
@@ -375,6 +383,11 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
         flower = DB.get_one_flower(id)
         if flower != None:
+            # If they are not the owner of this garden
+            garden = DB.get_one_garden(flower['garden_id'])
+            if self.session_data['uid'] != garden['userid']:
+                self.response(403)
+                return
             self.response(204)
             DB.delete_flower(id)
         else:
