@@ -37,7 +37,6 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Handle GET requests. """
         self.load_session()
         coll, id, valid = self.parse_path()
-        print(coll, id, valid)
         if not valid:
             self.response(404)
 
@@ -128,7 +127,6 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
                 id = int(parts[1])
             except:
                 return bad
-        print(collection, id, True)
         return (collection, id, True)
 
 
@@ -262,12 +260,12 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         if 'uid' not in self.session_data:
             self.no_auth(401)
             return
-        userid = self.session_data['uid']
+        uid = self.session_data['uid']
         self.response(201, True)
         body = self.decode()
         name = body['name']
         author = body['author']
-        created_id = DB.create_garden(name, author, userid)
+        created_id = DB.create_garden(name, author, uid)
         self.wfile.write(bytes(json.dumps(created_id), "utf-8"))
 
     def get_gardens(self):
@@ -295,7 +293,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         garden = DB.get_one_garden(id)
         if garden != None:
             # If they are not the owner of this garden
-            if self.session_data['uid'] != garden['userid']:
+            if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
             self.response(204)
@@ -314,7 +312,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         garden = DB.get_one_garden(id)
         if garden != None:
             # If they are not the owner of this garden
-            if self.session_data['uid'] != garden['userid']:
+            if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
             self.response(204)
@@ -348,7 +346,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         comment = DB.get_one_comment(id)
         if comment != None:
             # If they did not write the comment
-            if self.session_data['uid'] != comment['userid']:
+            if self.session_data['uid'] != comment['author_id']:
                 self.no_auth(403)
                 return
             self.response(204)
@@ -367,7 +365,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         comment = DB.get_one_comment(id)
         if comment != None:
             # If they did not write the comment
-            if self.session_data['uid'] != comment['userid']:
+            if self.session_data['uid'] != comment['author_id']:
                 self.no_auth(403)
                 return
             self.response(204)
@@ -403,7 +401,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         if flower != None:
             # If they are not the owner of this garden
             garden = DB.get_one_garden(flower['garden_id'])
-            if self.session_data['uid'] != garden['userid']:
+            if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
             self.response(204)
