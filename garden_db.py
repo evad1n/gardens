@@ -31,15 +31,13 @@ class GardensDB:
         """ Create the tables in the database for initial use. Will delete old tables. """
         with open("schema.sql", "r") as f:
             self.cursor.execute(f.read())
-        # self.con.commit()
 
     # USERS
     def create_user(self, first_name, last_name, email, password):
         """ Creates a user and stores the hashed password. """
         self.cursor.execute("INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s) RETURNING id", [first_name, last_name, email, password])
-        rid = self.cursor.fetchone()['id']
-        # self.con.commit()
-        return 1
+        rid = self.cursor.fetchone()
+        return rid
     
     def get_user(self, email):
         """ Returns the user's info. """
@@ -56,8 +54,7 @@ class GardensDB:
         """ Creates a garden and returns the id of the created garden. """
         data = [name, author, userid]
         self.cursor.execute("INSERT INTO gardens (name, author, author_id) VALUES (%s, %s, %s) RETURNING id", data)
-        rid = self.cursor.fetchone()['id']
-        # self.con.commit()
+        rid = self.cursor.fetchone()
         return rid
 
     def get_gardens(self):
@@ -82,18 +79,15 @@ class GardensDB:
 
     def update_garden(self, id, name):
         self.cursor.execute("UPDATE gardens SET name = %s WHERE id = %s", [name, id])
-        # self.con.commit()
 
     def delete_garden(self, id):
         self.cursor.execute("DELETE FROM gardens WHERE id = %s", [id])
-        # self.con.commit()
         
     # COMMENTS
     def create_comment(self, garden_id, comment, user_id):
         data = [comment, garden_id, user_id]
         self.cursor.execute("INSERT INTO comments (content, garden_id, author_id) VALUES (%s, %s, %s) RETURNING id", data)
-        rid = self.cursor.fetchone()['id']
-        # self.con.commit()
+        rid = self.cursor.fetchone()
         return rid
 
     def get_comments(self, garden_id):
@@ -108,18 +102,15 @@ class GardensDB:
 
     def update_comment(self, id, content):
         self.cursor.execute("UPDATE comments SET content = %s WHERE id = %s", [content, id])
-        # self.con.commit()
 
     def delete_comment(self, id):
         self.cursor.execute("DELETE FROM comments WHERE id = (%s)", [id])
-        # self.con.commit()
 
     # FLOWERS
     def create_flower(self, garden_id, color, x, y):
         data = [color, x, y, garden_id]
         self.cursor.execute("INSERT INTO flowers (color, x, y, garden_id) VALUES (%s, %s, %s, %s) RETURNING id", data)
-        rid = self.cursor.fetchone()['id']
-        # self.con.commit()
+        rid = self.cursor.fetchone()
         return rid
 
     def get_flowers(self, garden_id):
@@ -133,4 +124,3 @@ class GardensDB:
 
     def delete_flower(self, id):
         self.cursor.execute("DELETE FROM flowers WHERE id = (%s)", [id])
-        # self.con.commit()
