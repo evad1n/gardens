@@ -111,10 +111,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
         collection = parts[0]
         id = None
-        # Make sure type is int
-        if len(parts) > 1 and type(parts[1]) is int:
+        if len(parts) > 1:
             id = parts[1]
-        print(collection, id)
         return (collection, id)
 
 
@@ -122,6 +120,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Parses the request for URL search parameters and returns them in dict format. """
         length = self.headers['Content-Length']
         body = parse_qs(self.rfile.read(int(length)).decode("utf-8"))
+        for key in body:
+            body[key] = body[key][0]
         return body
 
     def response(self, status_code, body=False):
@@ -162,8 +162,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Attempts to login and authenticate. """
         DB = GardensDB()
         body = self.decode()
-        reqEmail = body['email'][0]
-        reqPassword = body['password'][0]
+        reqEmail = body['email']
+        reqPassword = body['password']
 
         # check password
         user = DB.get_user(reqEmail)
@@ -205,10 +205,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Creates a new user with a unique email. """
         DB = GardensDB()
         body = self.decode()
-        first_name = body['first_name'][0]
-        last_name = body['last_name'][0]
-        email = body['email'][0]
-        password = body['password'][0]
+        first_name = body['first_name']
+        last_name = body['last_name']
+        email = body['email']
+        password = body['password']
 
         # check if email is duplicate
         user = DB.get_user(email)
@@ -247,8 +247,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         userid = self.session_data['uid']
         self.response(201, True)
         body = self.decode()
-        name = body['name'][0]
-        author = body['author'][0]
+        name = body['name']
+        author = body['author']
         created_id = DB.create_garden(name, author, userid)
         self.wfile.write(bytes(json.dumps(created_id), "utf-8"))
 
@@ -282,7 +282,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
                 return
             self.response(204)
             body = self.decode()
-            name = body['name'][0]
+            name = body['name']
             DB.update_garden(id, name)
         else:
             self.response(404)
@@ -316,8 +316,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
         self.response(201)
         body = self.decode()
-        garden_id = body['gardenId'][0]
-        content = body['content'][0]
+        garden_id = body['gardenId']
+        content = body['content']
         user_id = self.session_data['uid']
         DB.create_comment(garden_id, content, user_id)
 
@@ -335,7 +335,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
                 return
             self.response(204)
             body = self.decode()
-            content = body['content'][0]
+            content = body['content']
             DB.update_comment(id, content)
         else:
             self.response(404)
@@ -369,10 +369,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
         self.response(201)
         body = self.decode()
-        garden_id = body['gardenId'][0]
-        color = body['color'][0]
-        x = body['x'][0]
-        y = body['y'][0]
+        garden_id = body['gardenId']
+        color = body['color']
+        x = body['x']
+        y = body['y']
         DB.create_flower(garden_id, color, x, y)
 
     def delete_flower(self, id):
