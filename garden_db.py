@@ -29,7 +29,7 @@ class GardensDB:
     def create_tables(self):
         """ Create the tables in the database for initial use. Will delete old tables. """
         with open("schema.sql", "r") as f:
-            self.cursor.execute(f.readlines())
+            self.cursor.execute(f.read())
         self.con.commit()
 
     # USERS
