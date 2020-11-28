@@ -35,7 +35,8 @@ class GardensDB:
     # USERS
     def create_user(self, first_name, last_name, email, password):
         """ Creates a user and stores the hashed password. """
-        rid = self.cursor.execute("INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s) RETURNING id", [first_name, last_name, email, password])
+        self.cursor.execute("INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s) RETURNING id", [first_name, last_name, email, password])
+        rid = self.cursor.fetchone()[0]
         self.con.commit()
         return rid
     
@@ -53,7 +54,8 @@ class GardensDB:
     def create_garden(self, name, author, userid):
         """ Creates a garden and returns the id of the created garden. """
         data = [name, author, userid]
-        rid = self.cursor.execute("INSERT INTO gardens (name, author, author_id) VALUES (%s, %s, %s) RETURNING id", data)
+        self.cursor.execute("INSERT INTO gardens (name, author, author_id) VALUES (%s, %s, %s) RETURNING id", data)
+        rid = self.cursor.fetchone()[0]
         self.con.commit()
         return rid
 
@@ -88,7 +90,8 @@ class GardensDB:
     # COMMENTS
     def create_comment(self, garden_id, comment, user_id):
         data = [comment, garden_id, user_id]
-        rid = self.cursor.execute("INSERT INTO comments (content, garden_id, author_id) VALUES (%s, %s, %s) RETURNING id", data)
+        self.cursor.execute("INSERT INTO comments (content, garden_id, author_id) VALUES (%s, %s, %s) RETURNING id", data)
+        rid = self.cursor.fetchone()[0]
         self.con.commit()
         return rid
 
@@ -113,7 +116,8 @@ class GardensDB:
     # FLOWERS
     def create_flower(self, garden_id, color, x, y):
         data = [color, x, y, garden_id]
-        rid = self.cursor.execute("INSERT INTO flowers (color, x, y, garden_id) VALUES (%s, %s, %s, %s) RETURNING id", data)
+        self.cursor.execute("INSERT INTO flowers (color, x, y, garden_id) VALUES (%s, %s, %s, %s) RETURNING id", data)
+        rid = self.cursor.fetchone()[0]
         self.con.commit()
         return rid
 
