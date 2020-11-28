@@ -20,6 +20,7 @@ class GardensDB:
             host=url.hostname,
             port=url.port
         )
+        self.con.autocommit = True
 
         self.cursor = self.con.cursor()
 
@@ -36,9 +37,11 @@ class GardensDB:
     def create_user(self, first_name, last_name, email, password):
         """ Creates a user and stores the hashed password. """
         self.cursor.execute("INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s) RETURNING id", [first_name, last_name, email, password])
-        rid = self.cursor.fetchone()[0]
+        f = self.cursor.fetchone()
+        print(f)
+        # rid = self.cursor.fetchone()[0]
         self.con.commit()
-        return rid
+        return 1
     
     def get_user(self, email):
         """ Returns the user's info. """
