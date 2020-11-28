@@ -1,4 +1,7 @@
 # Gardens Server
+
+https://gardens-server.herokuapp.com/
+
 ## Resources
 
 **Users**
