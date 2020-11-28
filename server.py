@@ -10,7 +10,6 @@ from http import cookies
 
 # Fix hanging
 from socketserver import ThreadingMixIn
-import threading
 
 from garden_db import GardensDB
 from session_store import SessionStore
@@ -319,7 +318,6 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
         """ Handle PUT requests. """
         self.load_session()
-        print(self.session_data)
         parts = self.path.split('/')
         if len(parts) < 3:
             self.response(404)
@@ -337,7 +335,6 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         self.load_session()
 
         # Short circuit for logout case
-        print(self.path)
         if self.path == "/sessions":
             self.delete_session()
             return
@@ -364,15 +361,18 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 def run():
     """ Run server. """
 
+    db = GardensDB()
+    db.create_tables()
+    db = None
+
     port = 8080
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
 
-    listen = ("127.0.0.1", port)
+    listen = ("0.0.0.0", port)
     server = ThreadedHTTPServer(listen, GardensHTTPRequestHandler)
 
-    print(f"Server is listening on port {port}...")
+    print(f"Server is listening on", "{}:{}...".format(*listen))
     server.serve_forever()
-
 
 run()
