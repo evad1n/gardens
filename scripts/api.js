@@ -1,4 +1,5 @@
-const URL = "http://localhost:8080";
+// const URL = "http://localhost:8080";
+const URL = "https://gardens-server.herokuapp.com";
 
 /**
  * Gets data from server
