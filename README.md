@@ -33,7 +33,7 @@ https://gardens-server.herokuapp.com/
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (
-id INTEGER PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 first_name TEXT NOT NULL,
 last_name TEXT NOT NULL,
 email TEXT NOT NULL,
@@ -41,7 +41,7 @@ password TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS gardens (
-id INTEGER PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 name TEXT NOT NULL,
 author TEXT NOT NULL,
 author_id INTEGER NOT NULL,
@@ -52,7 +52,7 @@ CONSTRAINT fk_gardens_users
 );
 
 CREATE TABLE IF NOT EXISTS flowers (
-id INTEGER PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 color TEXT NOT NULL,
 x REAL NOT NULL,
 y REAL NOT NULL,
@@ -64,7 +64,7 @@ CONSTRAINT fk_flowers_gardens
 );
 
 CREATE TABLE IF NOT EXISTS comments (
-id INTEGER PRIMARY KEY,
+id SERIAL PRIMARY KEY,
 content TEXT NOT NULL,
 garden_id INTEGER NOT NULL,
 author_id INTEGER NOT NULL,
