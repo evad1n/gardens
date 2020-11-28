@@ -8,7 +8,7 @@ let loginPassword = document.getElementById("password");
 let invalidLogin = document.getElementById("bad-login");
 
 let firstNameInput = document.getElementById("register-first-name");
-let lastNameInput = document.getElementById("register-first-name");
+let lastNameInput = document.getElementById("register-last-name");
 let emailInput = document.getElementById("register-email");
 let passwordInput = document.getElementById("register-password");
 let invalidRegister = document.getElementById("bad-register");
