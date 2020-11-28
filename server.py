@@ -21,29 +21,29 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     """ The HTTP request handler for the gardens app. """
 
     # HTTP METHODS
+
     def do_OPTIONS(self):
         """ Handle OPTIONS requests. Specififes allowed methods/headers. """
         self.load_session()
         self.send_response(200)
         self.send_header('Access-Control-Allow-Credentials', 'true')
-        self.send_header("Access-Control-Allow-Origin", "null")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Accept, Content-Type, Origin")
         self.send_cookie()
         self.end_headers()
 
     def do_GET(self):
         """ Handle GET requests. """
         self.load_session()
-        parts = self.path.split('/')
-        collection = parts[1]
-        if collection == "gardens":
-            if len(parts) > 2:
-                garden_id = parts[2]
-                self.get_one_garden(garden_id)
+        coll, id = self.parse_path()
+
+        if coll == "gardens":
+            if id:
+                self.get_one_garden(id)
             else:
                 self.get_gardens()
-        elif collection == "me" and len(parts) == 2:
+        elif coll == "me" and not id:
             self.get_user_data()
         else:
             self.response(404)
@@ -51,15 +51,19 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         """ Handle POST requests. """
         self.load_session()
-        if self.path == "/gardens":
+        coll, id = self.parse_path()
+        if id:
+            self.response(404)
+
+        if coll == "gardens":
             self.add_garden()
-        elif self.path == "/comments":
+        elif coll == "comments":
             self.add_comment()
-        elif self.path == "/flowers":
+        elif coll == "flowers":
             self.add_flower()
-        elif self.path == "/users":
+        elif coll == "users":
             self.add_user()
-        elif self.path == "/sessions":
+        elif coll == "sessions":
             self.create_session()
         else:
             self.response(404)
@@ -67,14 +71,11 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_PUT(self):
         """ Handle PUT requests. """
         self.load_session()
-        parts = self.path.split('/')
-        if len(parts) < 3:
-            self.response(404)
-        collection = parts[1]
-        id = parts[2]
-        if collection == "gardens":
+        coll, id = self.parse_path()
+
+        if coll == "gardens" and id:
             self.update_garden(id)
-        elif collection == "comments":
+        elif coll == "comments" and id:
             self.delete_comment(id)
         else:
             self.response(404)
@@ -82,28 +83,40 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_DELETE(self):
         """ Handle DELETE requests. """
         self.load_session()
+        coll, id = self.parse_path()
 
-        # Short circuit for logout case
-        if self.path == "/sessions":
+        if coll == "sessions" and not id:
             self.delete_session()
-            return
-
-        parts = self.path.split('/')
-        if len(parts) < 3:
-            self.response(404)
-        collection = parts[1]
-        id = parts[2]
-        if collection == "gardens":
+        elif coll == "gardens" and id:
             self.delete_garden(id)
-        elif collection == "comments":
+        elif coll == "comments" and id:
             self.delete_comment(id)
-        elif collection == "flowers":
+        elif coll == "flowers" and id:
             self.delete_flower(id)
         else:
             self.response(404)
 
 
     # HELPER METHODS
+
+    def parse_path(self):
+        """ Gets the resource collection and id from the request path. If it is not valid then return None. """
+        if not self.path.startswith("/"):
+            return None
+        # Skip first /
+        parts = self.path[1:].split("/")
+        # Throw away anything with too many parameters
+        if len(parts) > 2:
+            return None
+
+        collection = parts[0]
+        id = None
+        # Make sure type is int
+        if len(parts) > 1 and type(parts[1]) is int:
+            id = parts[1]
+        return (collection, id)
+
+
     def decode(self):
         """ Parses the request for URL search parameters and returns them in dict format. """
         length = self.headers['Content-Length']
@@ -122,6 +135,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     # COOKIES
+
     def get_cookie(self):
         """ Returns the cookie in the headers, or creates a new one if there is none. """
         if "Cookie" in self.headers:
@@ -135,6 +149,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     # SESSIONS
+
     def create_session(self):
         """ Attempts to login and authenticate. """
         DB = GardensDB()
@@ -214,6 +229,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     # GARDENS
+
     def add_garden(self):
         """ Creates a new garden with name and author. """
         DB = GardensDB()
@@ -282,6 +298,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     # COMMENTS
+
     def add_comment(self):
         """ Adds a comment to a particular garden. """
         DB = GardensDB()
@@ -334,6 +351,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
     # FLOWERS
+
     def add_flower(self):
         """ Adds a flower to a particular garden. """
         DB = GardensDB()
