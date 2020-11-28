@@ -100,19 +100,23 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     # HELPER METHODS
 
     def parse_path(self):
-        """ Gets the resource collection and id from the request path. If it is not valid then return None. """
+        """ Gets the resource collection and id from the request path. If it is not valid then return False. """
         if not self.path.startswith("/"):
-            return None
+            return False
         # Skip first /
         parts = self.path[1:].split("/")
         # Throw away anything with too many parameters
         if len(parts) > 2:
-            return None
+            return False
 
         collection = parts[0]
         id = None
+        # Make sure type is int
         if len(parts) > 1:
-            id = parts[1]
+            if type(parts[1]) is int:
+                id = parts[1]
+            else:
+                return False
         return (collection, id)
 
 
@@ -129,17 +133,19 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         if body:
             self.send_header("Content-Type", "application/json")
-        # Generic 401 msg
-        if status_code == 401:
-            self.send_header("Content-Type", "application/json")
-            self.wfile.write(bytes(json.dumps({'message': "Not authenticated"}), "utf-8"))
-        if status_code == 403:
-            self.send_header("Content-Type", "application/json")
-            self.wfile.write(bytes(json.dumps({'message': "Can only modify owned resources"}), "utf-8"))
         self.send_cookie()
         self.send_header("Access-Control-Allow-Origin", self.headers["Origin"])
         self.send_header("Access-Control-Allow-Credentials", "true")
         self.end_headers()
+
+    def no_auth(self, status_code):
+        """ Generic messages for no authentication/authorization. """
+        self.response(status_code, True)
+        if status_code == 401:
+            self.wfile.write(bytes(json.dumps({'message': "Not authenticated"}), "utf-8"))
+        elif status_code == 403:
+            self.wfile.write(bytes(json.dumps({'message': "Can only modify owned resources"}), "utf-8"))
+
 
 
     # COOKIES
@@ -172,9 +178,9 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
                 self.session_data['uid'] = user['id']
                 self.response(201, True)
             else:
-                self.response(401)
+                self.no_auth(401)
         else:
-            self.response(401)
+            self.no_auth(401)
 
 
     def load_session(self):
@@ -226,7 +232,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Gets user data if logged in. """
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
         
         self.response(200, True)
@@ -242,7 +248,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Creates a new garden with name and author. """
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
         userid = self.session_data['uid']
         self.response(201, True)
@@ -271,14 +277,14 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def update_garden(self, id):
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         garden = DB.get_one_garden(id)
         if garden != None:
             # If they are not the owner of this garden
             if self.session_data['uid'] != garden['userid']:
-                self.response(403)
+                self.no_auth(403)
                 return
             self.response(204)
             body = self.decode()
@@ -290,14 +296,14 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def delete_garden(self, id):
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
     
         garden = DB.get_one_garden(id)
         if garden != None:
             # If they are not the owner of this garden
             if self.session_data['uid'] != garden['userid']:
-                self.response(403)
+                self.no_auth(403)
                 return
             self.response(204)
             DB.delete_garden(id)
@@ -311,7 +317,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Adds a comment to a particular garden. """
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         self.response(201)
@@ -324,14 +330,14 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def update_comment(self, id):
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         comment = DB.get_one_comment(id)
         if comment != None:
             # If they did not write the comment
             if self.session_data['uid'] != comment['userid']:
-                self.response(403)
+                self.no_auth(403)
                 return
             self.response(204)
             body = self.decode()
@@ -343,14 +349,14 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def delete_comment(self, id):
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         comment = DB.get_one_comment(id)
         if comment != None:
             # If they did not write the comment
             if self.session_data['uid'] != comment['userid']:
-                self.response(403)
+                self.no_auth(403)
                 return
             self.response(204)
             DB.delete_comment(id)
@@ -364,7 +370,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Adds a flower to a particular garden. """
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         self.response(201)
@@ -378,7 +384,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
     def delete_flower(self, id):
         DB = GardensDB()
         if 'uid' not in self.session_data:
-            self.response(401)
+            self.no_auth(401)
             return
 
         flower = DB.get_one_flower(id)
@@ -386,7 +392,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             # If they are not the owner of this garden
             garden = DB.get_one_garden(flower['garden_id'])
             if self.session_data['uid'] != garden['userid']:
-                self.response(403)
+                self.no_auth(403)
                 return
             self.response(204)
             DB.delete_flower(id)
