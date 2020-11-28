@@ -29,7 +29,7 @@
 ## Schema
 
 ```sql
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 id INTEGER PRIMARY KEY,
 first_name TEXT NOT NULL,
 last_name TEXT NOT NULL,
@@ -37,40 +37,40 @@ email TEXT NOT NULL,
 password TEXT NOT NULL
 );
 
-CREATE TABLE gardens (
+CREATE TABLE IF NOT EXISTS gardens (
 id INTEGER PRIMARY KEY,
 name TEXT NOT NULL,
 author TEXT NOT NULL,
-userid INTEGER NOT NULL,
+author_id INTEGER NOT NULL,
 CONSTRAINT fk_gardens_users
-    FOREIGN KEY (userid)
+    FOREIGN KEY (author_id)
     REFERENCES users(id)
     ON DELETE CASCADE
 );
 
-CREATE TABLE flowers (
+CREATE TABLE IF NOT EXISTS flowers (
 id INTEGER PRIMARY KEY,
 color TEXT NOT NULL,
 x REAL NOT NULL,
 y REAL NOT NULL,
-gardenid INTEGER NOT NULL,
+garden_id INTEGER NOT NULL,
 CONSTRAINT fk_flowers_gardens
-    FOREIGN KEY (gardenid)
+    FOREIGN KEY (garden_id)
     REFERENCES gardens(id)
     ON DELETE CASCADE
 );
 
-CREATE TABLE comments (
+CREATE TABLE IF NOT EXISTS comments (
 id INTEGER PRIMARY KEY,
 content TEXT NOT NULL,
-gardenid INTEGER NOT NULL,
-userid INTEGER NOT NULL,
+garden_id INTEGER NOT NULL,
+author_id INTEGER NOT NULL,
 CONSTRAINT fk_comments_gardens
-    FOREIGN KEY (gardenid)
+    FOREIGN KEY (garden_id)
     REFERENCES gardens(id)
     ON DELETE CASCADE,
 CONSTRAINT fk_comments_users
-    FOREIGN KEY (userid)
+    FOREIGN KEY (author_id)
     REFERENCES users(id)
     ON DELETE CASCADE
 );
