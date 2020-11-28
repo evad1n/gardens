@@ -122,11 +122,11 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
 
         collection = parts[0]
         id = None
-        # Make sure type is int
         if len(parts) > 1:
-            if type(parts[1]) is int:
-                id = parts[1]
-            else:
+            # Make sure type is int
+            try:
+                id = int(parts[1])
+            except:
                 return bad
         print(collection, id, True)
         return (collection, id, True)
