@@ -28,7 +28,14 @@ class GardensDB:
         self.con.close()
 
     def create_tables(self):
-        """ Create the tables in the database for initial use. Will delete old tables. """
+        """ Create the tables in the database for initial use. Will NOT drop old tables. """
+        with open("schema.sql", "r") as f:
+            self.cursor.execute(f.read())
+
+    def reset(self):
+        """ Reset the tables in the database. Will drop old tables and recreate them. Deletes ALL data. """
+        with open("delete-tables.sql", "r") as f:
+            self.cursor.execute(f.read())
         with open("schema.sql", "r") as f:
             self.cursor.execute(f.read())
 

@@ -27,7 +27,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         self.load_session()
         self.send_response(200)
         self.send_header('Access-Control-Allow-Credentials', 'true')
-        self.send_header("Access-Control-Allow-Origin", "https://evad1n.github.io")
+        # For multiple domains, echo back the self.headers['Origin']
+        self.send_header("Access-Control-Allow-Origin", self.headers["Origin"])
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Accept, Content-Type, Origin")
         self.send_cookie()
@@ -54,9 +55,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         """ Handle POST requests. """
         self.load_session()
         coll, id, valid = self.parse_path()
-        if not valid:
-            self.response(404)
-        if id:
+        if not valid or id:
             self.response(404)
 
         if coll == "gardens":
