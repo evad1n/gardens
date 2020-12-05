@@ -40,6 +40,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         coll, id, valid = self.parse_path()
         if not valid:
             self.response(404)
+            return
 
         if coll == "gardens":
             if id:
@@ -57,6 +58,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         coll, id, valid = self.parse_path()
         if not valid or id:
             self.response(404)
+            return
 
         if coll == "gardens":
             self.add_garden()
@@ -77,6 +79,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         coll, id, valid = self.parse_path()
         if not valid:
             self.response(404)
+            return
 
         if coll == "gardens" and id:
             self.update_garden(id)
@@ -91,6 +94,7 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
         coll, id, valid = self.parse_path()
         if not valid:
             self.response(404)
+            return
 
         if coll == "sessions" and not id:
             self.delete_session()
