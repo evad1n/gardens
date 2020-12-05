@@ -232,10 +232,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(bytes(json.dumps({'message': "No duplicate email"}), "utf-8"))
             return
 
-        self.response(201, True)
         # hash password
         hashed = bcrypt.hash(password)
         DB.create_user(first_name, last_name, email, hashed)
+        self.response(201, True)
 
     def get_user_data(self):
         """ Gets user data if logged in. """
@@ -244,10 +244,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             self.no_auth(401)
             return
         
-        self.response(200, True)
         user_id = self.session_data['uid']
         user = DB.get_user_by_id(user_id)
         gardens = DB.get_user_gardens(user_id)
+        self.response(200, True)
         self.wfile.write(bytes(json.dumps({'first_name': user['first_name'], 'last_name': user['last_name'], 'id': user['id'],'gardens': gardens}), "utf-8"))
 
 
@@ -260,18 +260,18 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             self.no_auth(401)
             return
         uid = self.session_data['uid']
-        self.response(201, True)
         body = self.decode()
         name = body['name']
         author = body['author']
         created_id = DB.create_garden(name, author, uid)
+        self.response(201, True)
         self.wfile.write(bytes(json.dumps(created_id), "utf-8"))
 
     def get_gardens(self):
         """ Sends a list of all garden depth 0 information. """
         DB = GardensDB()
-        self.response(200, True)
         data = DB.get_gardens()
+        self.response(200, True)
         self.wfile.write(bytes(json.dumps(data), "utf-8"))
 
     def get_one_garden(self, id):
@@ -295,10 +295,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
-            self.response(204)
             body = self.decode()
             name = body['name']
             DB.update_garden(id, name)
+            self.response(204)
         else:
             self.response(404)
 
@@ -314,8 +314,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
-            self.response(204)
             DB.delete_garden(id)
+            self.response(204)
         else:
             self.response(404)
 
@@ -329,12 +329,12 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             self.no_auth(401)
             return
 
-        self.response(201)
         body = self.decode()
         garden_id = body['gardenId']
         content = body['content']
         user_id = self.session_data['uid']
         DB.create_comment(garden_id, content, user_id)
+        self.response(201)
 
     def update_comment(self, id):
         DB = GardensDB()
@@ -348,10 +348,10 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.session_data['uid'] != comment['author_id']:
                 self.no_auth(403)
                 return
-            self.response(204)
             body = self.decode()
             content = body['content']
             DB.update_comment(id, content)
+            self.response(204)
         else:
             self.response(404)
 
@@ -367,8 +367,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.session_data['uid'] != comment['author_id']:
                 self.no_auth(403)
                 return
-            self.response(204)
             DB.delete_comment(id)
+            self.response(204)
         else:
             self.response(404)
 
@@ -382,13 +382,13 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             self.no_auth(401)
             return
 
-        self.response(201)
         body = self.decode()
         garden_id = body['gardenId']
         color = body['color']
         x = body['x']
         y = body['y']
         DB.create_flower(garden_id, color, x, y)
+        self.response(201)
 
     def delete_flower(self, id):
         DB = GardensDB()
@@ -403,8 +403,8 @@ class GardensHTTPRequestHandler(BaseHTTPRequestHandler):
             if self.session_data['uid'] != garden['author_id']:
                 self.no_auth(403)
                 return
-            self.response(204)
             DB.delete_flower(id)
+            self.response(204)
         else:
             self.response(404)
 
@@ -426,7 +426,7 @@ def run():
     listen = ("0.0.0.0", port)
     server = ThreadedHTTPServer(listen, GardensHTTPRequestHandler)
 
-    print(f"Server is listening on", "{}:{}...".format(*listen))
+    print(f"Server is listening on", "http://{}:{}...".format(*listen))
     server.serve_forever()
 
 
