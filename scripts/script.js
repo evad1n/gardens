@@ -50,7 +50,7 @@ function selectGarden(gardenId) {
             oldFlowers = [...data.flowers];
             refreshGarden();
             showControls(true, $user != null);
-            allowEditing($user != null && $user.id == currentGarden.author_id);
+            allowEditing($user && $user.id == currentGarden.author_id);
             // Turn erasing off
             if (erasing) {
                 toggleErasing();
@@ -132,7 +132,7 @@ function refreshComments() {
             item.innerHTML = `<strong>${comment.author}</strong>: ${comment.content}`;
             item.classList.add('list-item');
             item.classList.add('comment-list-item');
-            item.onclick = () => { showCommentModal(comment, $user.id == comment.author_id); };
+            item.onclick = () => { showCommentModal(comment, $user && $user.id == comment.author_id); };
 
             commentList.appendChild(item);
         });
